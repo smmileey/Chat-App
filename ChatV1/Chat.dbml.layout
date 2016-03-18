@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="Chat">
+  <DataContextMoniker Name="/ChatDataContext" />
+  <nestedChildShapes>
+    <classShape Id="f26a7a2c-c93a-4057-8016-6694e1ded0e3" absoluteBounds="0.75, 3.875, 2, 1.9631982421874992">
+      <DataClassMoniker Name="/ChatDataContext/User" />
+      <nestedChildShapes>
+        <elementListCompartment Id="eb37bee2-f821-42ba-a8ba-c5f5cff37b98" absoluteBounds="0.765, 4.335, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="00b02276-575b-44d3-95e0-f0bc2c9e5ff5" absoluteBounds="0.75, 1.75, 2, 1.1939925130208335">
+      <DataClassMoniker Name="/ChatDataContext/Room" />
+      <nestedChildShapes>
+        <elementListCompartment Id="d7f72c6b-02a4-4698-805e-a172e9c3598d" absoluteBounds="0.765, 2.21, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="fc45475d-9d79-4174-b057-cd7bff8193c2" absoluteBounds="3.5, 0.75, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/ChatDataContext/Message" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ed5e5c0c-9a6f-46a3-a9e9-b0b2fd1e6e87" absoluteBounds="3.515, 1.21, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="cadd1daa-19a5-4fcc-a3b6-29bbf165c950" absoluteBounds="3.5, 4.125, 2, 1.3862939453124987">
+      <DataClassMoniker Name="/ChatDataContext/LoggedInUser" />
+      <nestedChildShapes>
+        <elementListCompartment Id="5fb0bbc1-5428-43f3-ac97-ae3f47543dfa" absoluteBounds="3.515, 4.585, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.75 : 2.32774983723958); (3.04166666666667 : 2.32774983723958 : JumpStart); (3.20833333333333 : 2.32774983723958 : JumpEnd); (3.22916666666667 : 2.32774983723958 : JumpStart); (3.39583333333333 : 2.32774983723958 : JumpEnd); (3.5 : 2.32774983723958)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/ChatDataContext/Room/Room_Message" />
+      <nodes>
+        <classShapeMoniker Id="00b02276-575b-44d3-95e0-f0bc2c9e5ff5" />
+        <classShapeMoniker Id="fc45475d-9d79-4174-b057-cd7bff8193c2" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 3.97013860712139); (3.15982443490112 : 3.56031417222027 : JumpStart); (3.27767556509888 : 3.44246304202252 : JumpEnd); (3.3125 : 3.40763860712139); (3.3125 : 1.50762291861979); (3.5 : 1.50762291861979)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+      <AssociationMoniker Name="/ChatDataContext/User/User_Message" />
+      <nodes>
+        <classShapeMoniker Id="f26a7a2c-c93a-4057-8016-6694e1ded0e3" />
+        <classShapeMoniker Id="fc45475d-9d79-4174-b057-cd7bff8193c2" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.7182867976262 : 3.875); (3.125 : 3.4682867976262); (3.125 : 1.50762291861979); (3.5 : 1.50762291861979)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+      <AssociationMoniker Name="/ChatDataContext/User/User_Message1" />
+      <nodes>
+        <classShapeMoniker Id="f26a7a2c-c93a-4057-8016-6694e1ded0e3" />
+        <classShapeMoniker Id="fc45475d-9d79-4174-b057-cd7bff8193c2" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 4.81814697265625); (3.5 : 4.81814697265625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/ChatDataContext/User/User_LoggedInUser" />
+      <nodes>
+        <classShapeMoniker Id="f26a7a2c-c93a-4057-8016-6694e1ded0e3" />
+        <classShapeMoniker Id="cadd1daa-19a5-4fcc-a3b6-29bbf165c950" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 2.91276401652644); (3.06607443490112 : 3.22883845142756 : JumpStart); (3.18392556509888 : 3.34668958162532 : JumpEnd); (3.21875 : 3.38151401652644); (3.21875 : 4.44032148632813); (3.5 : 4.44032148632813)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+      <AssociationMoniker Name="/ChatDataContext/Room/Room_LoggedInUser" />
+      <nodes>
+        <classShapeMoniker Id="00b02276-575b-44d3-95e0-f0bc2c9e5ff5" />
+        <classShapeMoniker Id="cadd1daa-19a5-4fcc-a3b6-29bbf165c950" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 5.22722045898437); (3.5 : 5.22722045898437)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/ChatDataContext/User/User_LoggedInUser1" />
+      <nodes>
+        <classShapeMoniker Id="f26a7a2c-c93a-4057-8016-6694e1ded0e3" />
+        <classShapeMoniker Id="cadd1daa-19a5-4fcc-a3b6-29bbf165c950" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

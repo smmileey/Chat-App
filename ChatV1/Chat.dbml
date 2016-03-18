@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="ChatV1" Class="ChatDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=pablo\SQLExpress;Initial Catalog=ChatV1;Integrated Security=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="ChatV1ConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Users" Member="Users">
+    <Type Name="User">
+      <Column Name="UserID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="FirstName" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="LastName" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Username" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Password" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+      <Column Name="Sex" Type="System.String" DbType="VarChar(15)" CanBeNull="true" />
+      <Association Name="User_Message" Member="Messages" ThisKey="UserID" OtherKey="ToUserID" Type="Message" />
+      <Association Name="User_Message1" Member="Messages1" ThisKey="UserID" OtherKey="UserID" Type="Message" />
+      <Association Name="User_LoggedInUser" Member="LoggedInUser" ThisKey="UserID" OtherKey="LoggedInUserId" Type="LoggedInUser" Cardinality="One" />
+      <Association Name="User_LoggedInUser1" Member="LoggedInUsers" ThisKey="UserID" OtherKey="UserID" Type="LoggedInUser" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Rooms" Member="Rooms">
+    <Type Name="Room">
+      <Column Name="RoomID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
+      <Association Name="Room_Message" Member="Messages" ThisKey="RoomID" OtherKey="RoomID" Type="Message" />
+      <Association Name="Room_LoggedInUser" Member="LoggedInUsers" ThisKey="RoomID" OtherKey="RoomID" Type="LoggedInUser" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Messages" Member="Messages">
+    <Type Name="Message">
+      <Column Name="MessageID" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="RoomID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ToUserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Text" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Color" Type="System.String" DbType="VarChar(25)" CanBeNull="true" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="TimeStamp" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="Room_Message" Member="Room" ThisKey="RoomID" OtherKey="RoomID" Type="Room" IsForeignKey="true" />
+      <Association Name="User_Message" Member="User" ThisKey="ToUserID" OtherKey="UserID" Type="User" IsForeignKey="true" />
+      <Association Name="User_Message1" Member="User1" ThisKey="UserID" OtherKey="UserID" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LoggedInUsers" Member="LoggedInUsers">
+    <Type Name="LoggedInUser">
+      <Column Name="LoggedInUserId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="RoomID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="User_LoggedInUser" Member="User" ThisKey="LoggedInUserId" OtherKey="UserID" Type="User" IsForeignKey="true" />
+      <Association Name="Room_LoggedInUser" Member="Room" ThisKey="RoomID" OtherKey="RoomID" Type="Room" IsForeignKey="true" />
+      <Association Name="User_LoggedInUser1" Member="User1" ThisKey="UserID" OtherKey="UserID" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+</Database>
