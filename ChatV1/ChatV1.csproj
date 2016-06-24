@@ -90,6 +90,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Style.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -100,7 +101,6 @@
     </Compile>
     <Compile Include="Chatroom.aspx.cs">
       <DependentUpon>Chatroom.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Chatroom.aspx.designer.cs">
       <DependentUpon>Chatroom.aspx</DependentUpon>

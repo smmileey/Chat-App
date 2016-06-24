@@ -31,6 +31,42 @@ namespace ChatV1 {
         protected global::System.Web.UI.ScriptManager ScriptManager1;
         
         /// <summary>
+        /// panelPrivateChat control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel panelPrivateChat;
+        
+        /// <summary>
+        /// lblChatNowUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblChatNowUser;
+        
+        /// <summary>
+        /// btnChatNow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnChatNow;
+        
+        /// <summary>
+        /// btnChatCancel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnChatCancel;
+        
+        /// <summary>
         /// updateTimer control.
         /// </summary>
         /// <remarks>

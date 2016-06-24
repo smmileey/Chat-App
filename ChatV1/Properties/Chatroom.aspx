@@ -5,10 +5,12 @@
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-    <title>Chat v0.1</title>
-        <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-        <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<head runat="server" >
+
+    <link href="Style.css" type="text/css" rel="stylesheet" />
+    <title>Chat v1.1</title>
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
     <script type="text/javascript">
         var yPosMsg, yPosUsr,isToUpdate=true,isLostFocus=false,diff=-1;
@@ -25,7 +27,6 @@
             yPosMsg = divMessages.scrollTop;
             yPosUsr = divUsers.scrollTop;
             diff = divMessages.scrollHeight- yPosMsg - divMessages.offsetHeight;
-            console.log(diff);
         };
 
         function pageLoadedHandler(sender, args) {  
@@ -46,63 +47,46 @@
 
         function LogOut() {
             //tą funkcję wywołujemy po stronie serwera przy zamknięciu przez użytkonika przeglądarki 
-            LogOutUserCallBack();
+            //podany argument pozwoli rozroznic, czy zdarzenie dotyczy wylogowywania, czy focusowania odpowiedniego okna parent/child (przy obsłudze prywatnych wiadomosci)
+            LogOutUserCallBack("LogOut");
         };
 
         function LogOutUser(result, context) {
             //tutaj otrzymamy wynik z przebiegu działania metody po stronie serwera
-            //wywołanej przez poniższą metodę LogMeOut()
+            //wywołanej przez poniższą metodę LogOut()
             //nic z nim nie robimy
         };
+
+        function FocusThisWindow(result, context) {
+            //wynik otrzymanyt z przebiegu działania metody po stronie serwera związanej z focusem na 
+            //konretnym TextBox'ie
+        };
+
+        function FocusMe() {
+            //funkcja wywoływana po stronie serwera
+            FocusThisWindowCallBack("FocusThisWindow");
+        };
     </script>
-    <style>
-         div#one {
-        width: 80%;
-        height: 100%;
-        background-color:white;
-        border-style:solid;
-        border-width:5px;
-        border-color:brown;
-        float: left;
-        box-sizing:border-box;
-        }
-         
-        div#two {
-        width: 20%;
-        height: 100%;
-        background-color:white;
-        border-style:solid;
-        border-width:5px;
-        border-color:brown;
-        box-sizing:border-box;
-        }
-
-        section{
-            width: 100%;
-            height: 70vh;
-            background: aqua;       
-        }
-
-        .wrapper:after{
-             display:table;
-             content:"";
-             clear:both;
-         }
-
-        #tBox,#btnSend,#tLabel,#ddlColors,#tLogout{
-            vertical-align:top;
-        }
-
-    </style>
 </head>
-<body onunload="LogOut()" onclose="LogOut()" style="position:relative;z-index:0;">
-    <div id="privateMessage" style="position:absolute;width:70px;height:70px;background-color:red;z-index:10;margin:0;top:50%;left:50%;">
-         I'm on the top
-    </div> 
-    <form id="form1" runat="server" defaultbutton="btnSend" defaultfocus="tBox">
-        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true"></asp:ScriptManager>
-        <asp:Timer runat="server" ID="updateTimer" OnTick="updateTimer_Tick" Interval="4000"></asp:Timer>
-        <section>
+<body onunload="LogOut()" onclose="LogOut()">
+    <form id="form1" runat="server" style="position:relative;z-index:0;">
+    <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true"></asp:ScriptManager>
+    <asp:UpdatePanel runat="server">
+        <Triggers>
+            <asp:AsyncPostBackTrigger ControlID="updateTimer" />
+        </Triggers>
+        <ContentTemplate>
+            <asp:Panel runat="server" Visible="false" CssClass="PrivateMessagePanel" ID="panelPrivateChat">
+                <div id ="privateMessageTitle">Prywatna wiadomość!</div>
+                <br /><asp:Label ID="lblChatNowUser" runat="server" Text="Here will be name"></asp:Label>
+                <br />zaprasza Cię na rozmowę prywatną.<br /><br />
+                <asp:Button runat="server" ID="btnChatNow" Text="Akceptuj" CausesValidation="false" OnClick="btnChatNow_Click"/>
+                <asp:Button runat="server" ID="btnChatCancel" Text="Odrzuć" CausesValidation ="false" OnClick="btnChatCancel_Click" />
+            </asp:Panel>
+        </ContentTemplate>
+    </asp:UpdatePanel>
+        <asp:Timer runat="server" ID="updateTimer" OnTick="updateTimer_Tick" Interval="10000" Enabled="false"></asp:Timer>
+        <section id="primary">
             <asp:UpdatePanel runat="server" UpdateMode="Conditional" RenderMode="Inline">
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="updateTimer"/>
@@ -124,7 +108,7 @@
                     <asp:AsyncPostBackTrigger ControlID="btnSend" />
                 </Triggers>
                 <ContentTemplate>
-                   <asp:TextBox runat="server" ID="tBox" Width="70%"></asp:TextBox>
+                   <asp:TextBox runat="server" ID="tBox" Width="70%" OnClick="FocusMe()"></asp:TextBox>
                    <ajaxToolkit:FilteredTextBoxExtender runat="server" FilterType="Custom" InvalidChars="><" FilterMode="InvalidChars" TargetControlID="tBox"/>
                    <asp:Button runat="server" Text="Wyślij" Width="5%" ID="btnSend" OnClick="btnSend_Click"/>
                    <asp:Label ID="tLabel" runat="server" Width="4%">Kolor:</asp:Label>

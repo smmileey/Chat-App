@@ -33,15 +33,18 @@ namespace ChatV1
     partial void InsertUser(User instance);
     partial void UpdateUser(User instance);
     partial void DeleteUser(User instance);
+    partial void InsertLoggedInUser(LoggedInUser instance);
+    partial void UpdateLoggedInUser(LoggedInUser instance);
+    partial void DeleteLoggedInUser(LoggedInUser instance);
+    partial void InsertPrivateMessage(PrivateMessage instance);
+    partial void UpdatePrivateMessage(PrivateMessage instance);
+    partial void DeletePrivateMessage(PrivateMessage instance);
     partial void InsertRoom(Room instance);
     partial void UpdateRoom(Room instance);
     partial void DeleteRoom(Room instance);
     partial void InsertMessage(Message instance);
     partial void UpdateMessage(Message instance);
     partial void DeleteMessage(Message instance);
-    partial void InsertLoggedInUser(LoggedInUser instance);
-    partial void UpdateLoggedInUser(LoggedInUser instance);
-    partial void DeleteLoggedInUser(LoggedInUser instance);
     #endregion
 		
 		public ChatDataContext() : 
@@ -82,6 +85,22 @@ namespace ChatV1
 			}
 		}
 		
+		public System.Data.Linq.Table<LoggedInUser> LoggedInUsers
+		{
+			get
+			{
+				return this.GetTable<LoggedInUser>();
+			}
+		}
+		
+		public System.Data.Linq.Table<PrivateMessage> PrivateMessages
+		{
+			get
+			{
+				return this.GetTable<PrivateMessage>();
+			}
+		}
+		
 		public System.Data.Linq.Table<Room> Rooms
 		{
 			get
@@ -95,14 +114,6 @@ namespace ChatV1
 			get
 			{
 				return this.GetTable<Message>();
-			}
-		}
-		
-		public System.Data.Linq.Table<LoggedInUser> LoggedInUsers
-		{
-			get
-			{
-				return this.GetTable<LoggedInUser>();
 			}
 		}
 	}
@@ -125,13 +136,15 @@ namespace ChatV1
 		
 		private string _Sex;
 		
+		private EntitySet<LoggedInUser> _LoggedInUsers;
+		
+		private EntitySet<PrivateMessage> _PrivateMessages;
+		
+		private EntitySet<PrivateMessage> _PrivateMessages1;
+		
 		private EntitySet<Message> _Messages;
 		
 		private EntitySet<Message> _Messages1;
-		
-		private EntityRef<LoggedInUser> _LoggedInUser;
-		
-		private EntitySet<LoggedInUser> _LoggedInUsers;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -153,10 +166,11 @@ namespace ChatV1
 		
 		public User()
 		{
+			this._LoggedInUsers = new EntitySet<LoggedInUser>(new Action<LoggedInUser>(this.attach_LoggedInUsers), new Action<LoggedInUser>(this.detach_LoggedInUsers));
+			this._PrivateMessages = new EntitySet<PrivateMessage>(new Action<PrivateMessage>(this.attach_PrivateMessages), new Action<PrivateMessage>(this.detach_PrivateMessages));
+			this._PrivateMessages1 = new EntitySet<PrivateMessage>(new Action<PrivateMessage>(this.attach_PrivateMessages1), new Action<PrivateMessage>(this.detach_PrivateMessages1));
 			this._Messages = new EntitySet<Message>(new Action<Message>(this.attach_Messages), new Action<Message>(this.detach_Messages));
 			this._Messages1 = new EntitySet<Message>(new Action<Message>(this.attach_Messages1), new Action<Message>(this.detach_Messages1));
-			this._LoggedInUser = default(EntityRef<LoggedInUser>);
-			this._LoggedInUsers = new EntitySet<LoggedInUser>(new Action<LoggedInUser>(this.attach_LoggedInUsers), new Action<LoggedInUser>(this.detach_LoggedInUsers));
 			OnCreated();
 		}
 		
@@ -280,6 +294,45 @@ namespace ChatV1
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_LoggedInUser", Storage="_LoggedInUsers", ThisKey="UserID", OtherKey="UserID")]
+		public EntitySet<LoggedInUser> LoggedInUsers
+		{
+			get
+			{
+				return this._LoggedInUsers;
+			}
+			set
+			{
+				this._LoggedInUsers.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_PrivateMessage", Storage="_PrivateMessages", ThisKey="UserID", OtherKey="ToUserID")]
+		public EntitySet<PrivateMessage> PrivateMessages
+		{
+			get
+			{
+				return this._PrivateMessages;
+			}
+			set
+			{
+				this._PrivateMessages.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_PrivateMessage1", Storage="_PrivateMessages1", ThisKey="UserID", OtherKey="UserID")]
+		public EntitySet<PrivateMessage> PrivateMessages1
+		{
+			get
+			{
+				return this._PrivateMessages1;
+			}
+			set
+			{
+				this._PrivateMessages1.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Message", Storage="_Messages", ThisKey="UserID", OtherKey="ToUserID")]
 		public EntitySet<Message> Messages
 		{
@@ -306,48 +359,6 @@ namespace ChatV1
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_LoggedInUser", Storage="_LoggedInUser", ThisKey="UserID", OtherKey="LoggedInUserId", IsUnique=true, IsForeignKey=false)]
-		public LoggedInUser LoggedInUser
-		{
-			get
-			{
-				return this._LoggedInUser.Entity;
-			}
-			set
-			{
-				LoggedInUser previousValue = this._LoggedInUser.Entity;
-				if (((previousValue != value) 
-							|| (this._LoggedInUser.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._LoggedInUser.Entity = null;
-						previousValue.User = null;
-					}
-					this._LoggedInUser.Entity = value;
-					if ((value != null))
-					{
-						value.User = this;
-					}
-					this.SendPropertyChanged("LoggedInUser");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_LoggedInUser1", Storage="_LoggedInUsers", ThisKey="UserID", OtherKey="UserID")]
-		public EntitySet<LoggedInUser> LoggedInUsers
-		{
-			get
-			{
-				return this._LoggedInUsers;
-			}
-			set
-			{
-				this._LoggedInUsers.Assign(value);
-			}
-		}
-		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -366,6 +377,42 @@ namespace ChatV1
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void attach_LoggedInUsers(LoggedInUser entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_LoggedInUsers(LoggedInUser entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
+		private void attach_PrivateMessages(PrivateMessage entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_PrivateMessages(PrivateMessage entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
+		private void attach_PrivateMessages1(PrivateMessage entity)
+		{
+			this.SendPropertyChanging();
+			entity.User1 = this;
+		}
+		
+		private void detach_PrivateMessages1(PrivateMessage entity)
+		{
+			this.SendPropertyChanging();
+			entity.User1 = null;
 		}
 		
 		private void attach_Messages(Message entity)
@@ -391,17 +438,389 @@ namespace ChatV1
 			this.SendPropertyChanging();
 			entity.User1 = null;
 		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.LoggedInUsers")]
+	public partial class LoggedInUser : INotifyPropertyChanging, INotifyPropertyChanged
+	{
 		
-		private void attach_LoggedInUsers(LoggedInUser entity)
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private System.Nullable<int> _UserID;
+		
+		private System.Nullable<int> _RoomID;
+		
+		private int _LoggedInUserId;
+		
+		private EntityRef<User> _User;
+		
+		private EntityRef<Room> _Room;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnUserIDChanging(System.Nullable<int> value);
+    partial void OnUserIDChanged();
+    partial void OnRoomIDChanging(System.Nullable<int> value);
+    partial void OnRoomIDChanged();
+    partial void OnLoggedInUserIdChanging(int value);
+    partial void OnLoggedInUserIdChanged();
+    #endregion
+		
+		public LoggedInUser()
 		{
-			this.SendPropertyChanging();
-			entity.User1 = this;
+			this._User = default(EntityRef<User>);
+			this._Room = default(EntityRef<Room>);
+			OnCreated();
 		}
 		
-		private void detach_LoggedInUsers(LoggedInUser entity)
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserID", DbType="Int")]
+		public System.Nullable<int> UserID
 		{
-			this.SendPropertyChanging();
-			entity.User1 = null;
+			get
+			{
+				return this._UserID;
+			}
+			set
+			{
+				if ((this._UserID != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._UserID = value;
+					this.SendPropertyChanged("UserID");
+					this.OnUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RoomID", DbType="Int")]
+		public System.Nullable<int> RoomID
+		{
+			get
+			{
+				return this._RoomID;
+			}
+			set
+			{
+				if ((this._RoomID != value))
+				{
+					if (this._Room.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnRoomIDChanging(value);
+					this.SendPropertyChanging();
+					this._RoomID = value;
+					this.SendPropertyChanged("RoomID");
+					this.OnRoomIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LoggedInUserId", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		public int LoggedInUserId
+		{
+			get
+			{
+				return this._LoggedInUserId;
+			}
+			set
+			{
+				if ((this._LoggedInUserId != value))
+				{
+					this.OnLoggedInUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._LoggedInUserId = value;
+					this.SendPropertyChanged("LoggedInUserId");
+					this.OnLoggedInUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_LoggedInUser", Storage="_User", ThisKey="UserID", OtherKey="UserID", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.LoggedInUsers.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.LoggedInUsers.Add(this);
+						this._UserID = value.UserID;
+					}
+					else
+					{
+						this._UserID = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Room_LoggedInUser", Storage="_Room", ThisKey="RoomID", OtherKey="RoomID", IsForeignKey=true)]
+		public Room Room
+		{
+			get
+			{
+				return this._Room.Entity;
+			}
+			set
+			{
+				Room previousValue = this._Room.Entity;
+				if (((previousValue != value) 
+							|| (this._Room.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Room.Entity = null;
+						previousValue.LoggedInUsers.Remove(this);
+					}
+					this._Room.Entity = value;
+					if ((value != null))
+					{
+						value.LoggedInUsers.Add(this);
+						this._RoomID = value.RoomID;
+					}
+					else
+					{
+						this._RoomID = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("Room");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.PrivateMessage")]
+	public partial class PrivateMessage : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _PrivateMessageID;
+		
+		private System.Nullable<int> _UserID;
+		
+		private System.Nullable<int> _ToUserID;
+		
+		private EntityRef<User> _User;
+		
+		private EntityRef<User> _User1;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnPrivateMessageIDChanging(int value);
+    partial void OnPrivateMessageIDChanged();
+    partial void OnUserIDChanging(System.Nullable<int> value);
+    partial void OnUserIDChanged();
+    partial void OnToUserIDChanging(System.Nullable<int> value);
+    partial void OnToUserIDChanged();
+    #endregion
+		
+		public PrivateMessage()
+		{
+			this._User = default(EntityRef<User>);
+			this._User1 = default(EntityRef<User>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PrivateMessageID", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		public int PrivateMessageID
+		{
+			get
+			{
+				return this._PrivateMessageID;
+			}
+			set
+			{
+				if ((this._PrivateMessageID != value))
+				{
+					this.OnPrivateMessageIDChanging(value);
+					this.SendPropertyChanging();
+					this._PrivateMessageID = value;
+					this.SendPropertyChanged("PrivateMessageID");
+					this.OnPrivateMessageIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserID", DbType="Int")]
+		public System.Nullable<int> UserID
+		{
+			get
+			{
+				return this._UserID;
+			}
+			set
+			{
+				if ((this._UserID != value))
+				{
+					if (this._User1.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._UserID = value;
+					this.SendPropertyChanged("UserID");
+					this.OnUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ToUserID", DbType="Int")]
+		public System.Nullable<int> ToUserID
+		{
+			get
+			{
+				return this._ToUserID;
+			}
+			set
+			{
+				if ((this._ToUserID != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnToUserIDChanging(value);
+					this.SendPropertyChanging();
+					this._ToUserID = value;
+					this.SendPropertyChanged("ToUserID");
+					this.OnToUserIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_PrivateMessage", Storage="_User", ThisKey="ToUserID", OtherKey="UserID", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.PrivateMessages.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.PrivateMessages.Add(this);
+						this._ToUserID = value.UserID;
+					}
+					else
+					{
+						this._ToUserID = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_PrivateMessage1", Storage="_User1", ThisKey="UserID", OtherKey="UserID", IsForeignKey=true)]
+		public User User1
+		{
+			get
+			{
+				return this._User1.Entity;
+			}
+			set
+			{
+				User previousValue = this._User1.Entity;
+				if (((previousValue != value) 
+							|| (this._User1.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User1.Entity = null;
+						previousValue.PrivateMessages1.Remove(this);
+					}
+					this._User1.Entity = value;
+					if ((value != null))
+					{
+						value.PrivateMessages1.Add(this);
+						this._UserID = value.UserID;
+					}
+					else
+					{
+						this._UserID = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("User1");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	
@@ -415,9 +834,9 @@ namespace ChatV1
 		
 		private string _Name;
 		
-		private EntitySet<Message> _Messages;
-		
 		private EntitySet<LoggedInUser> _LoggedInUsers;
+		
+		private EntitySet<Message> _Messages;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -431,8 +850,8 @@ namespace ChatV1
 		
 		public Room()
 		{
-			this._Messages = new EntitySet<Message>(new Action<Message>(this.attach_Messages), new Action<Message>(this.detach_Messages));
 			this._LoggedInUsers = new EntitySet<LoggedInUser>(new Action<LoggedInUser>(this.attach_LoggedInUsers), new Action<LoggedInUser>(this.detach_LoggedInUsers));
+			this._Messages = new EntitySet<Message>(new Action<Message>(this.attach_Messages), new Action<Message>(this.detach_Messages));
 			OnCreated();
 		}
 		
@@ -476,19 +895,6 @@ namespace ChatV1
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Room_Message", Storage="_Messages", ThisKey="RoomID", OtherKey="RoomID")]
-		public EntitySet<Message> Messages
-		{
-			get
-			{
-				return this._Messages;
-			}
-			set
-			{
-				this._Messages.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Room_LoggedInUser", Storage="_LoggedInUsers", ThisKey="RoomID", OtherKey="RoomID")]
 		public EntitySet<LoggedInUser> LoggedInUsers
 		{
@@ -499,6 +905,19 @@ namespace ChatV1
 			set
 			{
 				this._LoggedInUsers.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Room_Message", Storage="_Messages", ThisKey="RoomID", OtherKey="RoomID")]
+		public EntitySet<Message> Messages
+		{
+			get
+			{
+				return this._Messages;
+			}
+			set
+			{
+				this._Messages.Assign(value);
 			}
 		}
 		
@@ -522,18 +941,6 @@ namespace ChatV1
 			}
 		}
 		
-		private void attach_Messages(Message entity)
-		{
-			this.SendPropertyChanging();
-			entity.Room = this;
-		}
-		
-		private void detach_Messages(Message entity)
-		{
-			this.SendPropertyChanging();
-			entity.Room = null;
-		}
-		
 		private void attach_LoggedInUsers(LoggedInUser entity)
 		{
 			this.SendPropertyChanging();
@@ -541,6 +948,18 @@ namespace ChatV1
 		}
 		
 		private void detach_LoggedInUsers(LoggedInUser entity)
+		{
+			this.SendPropertyChanging();
+			entity.Room = null;
+		}
+		
+		private void attach_Messages(Message entity)
+		{
+			this.SendPropertyChanging();
+			entity.Room = this;
+		}
+		
+		private void detach_Messages(Message entity)
 		{
 			this.SendPropertyChanging();
 			entity.Room = null;
@@ -567,6 +986,8 @@ namespace ChatV1
 		
 		private System.DateTime _TimeStamp;
 		
+		private System.Nullable<int> _systemMsg;
+		
 		private EntityRef<Room> _Room;
 		
 		private EntityRef<User> _User;
@@ -591,6 +1012,8 @@ namespace ChatV1
     partial void OnUserIDChanged();
     partial void OnTimeStampChanging(System.DateTime value);
     partial void OnTimeStampChanged();
+    partial void OnsystemMsgChanging(System.Nullable<int> value);
+    partial void OnsystemMsgChanged();
     #endregion
 		
 		public Message()
@@ -753,6 +1176,26 @@ namespace ChatV1
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_systemMsg", DbType="Int")]
+		public System.Nullable<int> systemMsg
+		{
+			get
+			{
+				return this._systemMsg;
+			}
+			set
+			{
+				if ((this._systemMsg != value))
+				{
+					this.OnsystemMsgChanging(value);
+					this.SendPropertyChanging();
+					this._systemMsg = value;
+					this.SendPropertyChanged("systemMsg");
+					this.OnsystemMsgChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Room_Message", Storage="_Room", ThisKey="RoomID", OtherKey="RoomID", IsForeignKey=true)]
 		public Room Room
 		{
@@ -849,239 +1292,6 @@ namespace ChatV1
 					else
 					{
 						this._UserID = default(int);
-					}
-					this.SendPropertyChanged("User1");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.LoggedInUsers")]
-	public partial class LoggedInUser : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _LoggedInUserId;
-		
-		private System.Nullable<int> _UserID;
-		
-		private System.Nullable<int> _RoomID;
-		
-		private EntityRef<User> _User;
-		
-		private EntityRef<Room> _Room;
-		
-		private EntityRef<User> _User1;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnLoggedInUserIdChanging(int value);
-    partial void OnLoggedInUserIdChanged();
-    partial void OnUserIDChanging(System.Nullable<int> value);
-    partial void OnUserIDChanged();
-    partial void OnRoomIDChanging(System.Nullable<int> value);
-    partial void OnRoomIDChanged();
-    #endregion
-		
-		public LoggedInUser()
-		{
-			this._User = default(EntityRef<User>);
-			this._Room = default(EntityRef<Room>);
-			this._User1 = default(EntityRef<User>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LoggedInUserId", DbType="Int NOT NULL", IsPrimaryKey=true)]
-		public int LoggedInUserId
-		{
-			get
-			{
-				return this._LoggedInUserId;
-			}
-			set
-			{
-				if ((this._LoggedInUserId != value))
-				{
-					if (this._User.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnLoggedInUserIdChanging(value);
-					this.SendPropertyChanging();
-					this._LoggedInUserId = value;
-					this.SendPropertyChanged("LoggedInUserId");
-					this.OnLoggedInUserIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserID", DbType="Int")]
-		public System.Nullable<int> UserID
-		{
-			get
-			{
-				return this._UserID;
-			}
-			set
-			{
-				if ((this._UserID != value))
-				{
-					if (this._User1.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnUserIDChanging(value);
-					this.SendPropertyChanging();
-					this._UserID = value;
-					this.SendPropertyChanged("UserID");
-					this.OnUserIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RoomID", DbType="Int")]
-		public System.Nullable<int> RoomID
-		{
-			get
-			{
-				return this._RoomID;
-			}
-			set
-			{
-				if ((this._RoomID != value))
-				{
-					if (this._Room.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnRoomIDChanging(value);
-					this.SendPropertyChanging();
-					this._RoomID = value;
-					this.SendPropertyChanged("RoomID");
-					this.OnRoomIDChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_LoggedInUser", Storage="_User", ThisKey="LoggedInUserId", OtherKey="UserID", IsForeignKey=true)]
-		public User User
-		{
-			get
-			{
-				return this._User.Entity;
-			}
-			set
-			{
-				User previousValue = this._User.Entity;
-				if (((previousValue != value) 
-							|| (this._User.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._User.Entity = null;
-						previousValue.LoggedInUser = null;
-					}
-					this._User.Entity = value;
-					if ((value != null))
-					{
-						value.LoggedInUser = this;
-						this._LoggedInUserId = value.UserID;
-					}
-					else
-					{
-						this._LoggedInUserId = default(int);
-					}
-					this.SendPropertyChanged("User");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Room_LoggedInUser", Storage="_Room", ThisKey="RoomID", OtherKey="RoomID", IsForeignKey=true)]
-		public Room Room
-		{
-			get
-			{
-				return this._Room.Entity;
-			}
-			set
-			{
-				Room previousValue = this._Room.Entity;
-				if (((previousValue != value) 
-							|| (this._Room.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._Room.Entity = null;
-						previousValue.LoggedInUsers.Remove(this);
-					}
-					this._Room.Entity = value;
-					if ((value != null))
-					{
-						value.LoggedInUsers.Add(this);
-						this._RoomID = value.RoomID;
-					}
-					else
-					{
-						this._RoomID = default(Nullable<int>);
-					}
-					this.SendPropertyChanged("Room");
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_LoggedInUser1", Storage="_User1", ThisKey="UserID", OtherKey="UserID", IsForeignKey=true)]
-		public User User1
-		{
-			get
-			{
-				return this._User1.Entity;
-			}
-			set
-			{
-				User previousValue = this._User1.Entity;
-				if (((previousValue != value) 
-							|| (this._User1.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._User1.Entity = null;
-						previousValue.LoggedInUsers.Remove(this);
-					}
-					this._User1.Entity = value;
-					if ((value != null))
-					{
-						value.LoggedInUsers.Add(this);
-						this._UserID = value.UserID;
-					}
-					else
-					{
-						this._UserID = default(Nullable<int>);
 					}
 					this.SendPropertyChanged("User1");
 				}

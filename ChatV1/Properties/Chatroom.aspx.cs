@@ -21,7 +21,6 @@ namespace ChatV1
         {
             Session["roomID"] = Request["roomID"];
 
-            //ogarnąć co z tą autentykacją i autoryzacją
             if (Session["ChatUserID"] == null || Convert.ToInt32(Session["ChatUserID"])==0
                 || Session["roomID"] == null || Convert.ToInt32(Session["roomID"])==0)
                     Response.Redirect("Default.aspx");
@@ -31,17 +30,72 @@ namespace ChatV1
                 Session["timeStamp"] = DateTime.Now;
                 Session["roomID"] = Request["roomID"];
                 Session["lastMessage"] = new Queue<string>();
+
                 PrepareListOfColors();
                 GetRoomInformation();
                 GetLoggedUsers();
                 GetMessages();
                 updateTimer.Enabled = true;
+
+                //focusowanie okna
+                FocusThisWindow();
             }
+            Session["searchForPrivate"] = true;
+
             //automatyczne wylogowanie, gdy użytkownik zamknie przeglądarkę
             string callBackReference = Page.ClientScript.GetCallbackEventReference(this, "arg", "LogOutUser", "");
             string logoutUserCallBackScript = "function LogOutUserCallBack(arg,context){" + callBackReference + ";}";
             ScriptManager.RegisterClientScriptBlock(this, typeof(Page), "LogOutUserCallBack",
                 logoutUserCallBackScript, true);
+
+            //automatyczne focusowanie, gdy klikniemy w textBox danego TextBoxa w danym oknie
+            string focusWindowCallBackReference = Page.ClientScript.GetCallbackEventReference(this, "arg", "FocusThisWindow", "");
+            string focusThisWindowCallBackScript = "function FocusThisWindowCallBack(arg, context) { " + focusWindowCallBackReference + "; }";
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "FocusThisWindowCallBack", focusThisWindowCallBackScript, true);
+        }
+
+        //ustawienie okna na daną Chatroom
+        //dla tego okna nie trzeba nic sprawdzac, kazda otwarta przegladarka to jedna instancja
+        //poszczegolne z nich nie dziela ze sobą sesji
+        private void FocusThisWindow()
+        {
+            form1.DefaultButton = "btnSend";
+            form1.DefaultFocus = "tBox";
+            Session["DefaultWindow"] = "MainWindow";
+        }
+
+        //sprawdzenie zaproszen do prywatnych konwersacji
+        private void CheckForPrivateMessages()
+        {
+            //sprawdzam, czy mozna, być może już jest zaproszenie, które jeszcze nie doczekało się odpowiedzi
+            if ((bool)Session["searchForPrivate"])
+            {
+                Session["searchForPrivate"] = false;
+                ChatDataContext db = new ChatDataContext();
+
+                var inv = (from msg in db.PrivateMessages
+                           where msg.ToUserID == Convert.ToInt32(Session["ChatUserID"])
+                           orderby msg.PrivateMessageID
+                           select msg).SingleOrDefault();
+
+                if(inv != null)
+                {
+                    var username = (from user in db.Users
+                                    where user.UserID == inv.UserID
+                                    select user.Username).SingleOrDefault();
+
+                    lblChatNowUser.Text = username;
+                    btnChatNow.OnClientClick =
+                       "window.open('ChatWindow.aspx?FromUserId=" + Session["ChatUserID"] +
+                       "&ToUserId=" + inv.UserID + "&Username=" + username +"&IsReply=yes','','width=400,"
+                       +"height=200'); isLostFocus = 'true';";
+
+                    panelPrivateChat.Visible = true;
+
+                    db.PrivateMessages.DeleteOnSubmit(inv);
+                    db.SubmitChanges();
+                }
+            }
         }
 
         //pobierz zalogowanych użytkowników
@@ -59,7 +113,7 @@ namespace ChatV1
             {
                 LoggedInUser loggedUser = new LoggedInUser();
                 int id = (from user in db.LoggedInUsers
-                          orderby user.LoggedInUserId
+                          orderby user.LoggedInUserId descending
                           select user.LoggedInUserId
                           ).FirstOrDefault();
                 loggedUser.LoggedInUserId = id+1;
@@ -91,7 +145,7 @@ namespace ChatV1
                 //do wszystkich uzytkownikow oprocz biezacego beda linki (do prywatnej rozmowy)
                 if (thisOne.Username != (string)Session["ChatUsername"])
                     sb.Append("<a href=# onclick=\"window.open('ChatWindow.aspx?FromUserID="+ Session["ChatUserID"]
-                    + "&ToUserID=" + loggedOne.UserID + "&Username=" + thisOne.Username+ "',"
+                    + "&ToUserID=" + loggedOne.UserID + "&Username=" + thisOne.Username+ "&isReply=no"+"',"
                     +"'','width=400,height=200,scrollbars=no,toolbars=no,titlebar=no,menubar=no'); isLostFocus='true';\">"
                     +thisOne.Username+"</a><br>");
                 else
@@ -101,7 +155,7 @@ namespace ChatV1
             litUsers.Text = sb.ToString();
         }
 
-        //pobierz wiadomości
+        //pobierz wiadomości z bazy (od momentu zalogowania, max 1000)
         private void GetMessages()
         {
             ChatDataContext db = new ChatDataContext();
@@ -147,6 +201,7 @@ namespace ChatV1
             }
         }
 
+        //info o pokoju
         private void GetRoomInformation()
         {
             ChatDataContext db = new ChatDataContext();
@@ -159,6 +214,7 @@ namespace ChatV1
                 "<br>Zalogowano jako: " + Session["ChatUserName"]; 
         }
 
+        //wstawienie wiadomości do bazy danych
         private void InsertMessageToDatabase(string text)
         {
             ChatDataContext db = new ChatDataContext();
@@ -177,6 +233,7 @@ namespace ChatV1
             db.SubmitChanges();
         }
 
+        //lista kolorów możliwych do użycia
         private void PrepareListOfColors()
         {
             DataTable dt = new DataTable();
@@ -219,10 +276,11 @@ namespace ChatV1
                 ((Queue<string>)Session["lastMessage"]).Enqueue(tBox.Text);
                 tBox.Text = string.Empty;
             }
-            ScriptManager1.SetFocus(tBox);
+            FocusThisWindow();
             Session["scrollDown"] = true;
         }
 
+        //przesuń scroll na "sam dół"
         private void ScrollToBottom()
         {
             string script = "var divChat=document.getElementById('one');divChat.scrollTop=divChat.scrollHeight;isToUpdate=false;";
@@ -241,7 +299,6 @@ namespace ChatV1
                     InsertMessageToDatabase(next);
                 }
             }
-
             GetMessages();
             GetRoomInformation();
             GetLoggedUsers();
@@ -250,6 +307,13 @@ namespace ChatV1
                 ScrollToBottom();
                 Session["scrollDown"] = false;
             }
+            CheckForPrivateMessages();
+
+            if (Session["DefaultWindow"] != null)
+            {
+                if (Session["DefaultWindow"].ToString() == "MainWindow")
+                    FocusThisWindow();
+            }
         }
 
         //to zostanie wywołane przez klienta przy zamknięciu przeglądarki przez użytkownika
@@ -257,21 +321,30 @@ namespace ChatV1
         {
             _callBackStatus = "failed";
 
-            ChatDataContext db = new ChatDataContext();
-            var loggedUser = (from user in db.LoggedInUsers
-                              where user.RoomID == Convert.ToInt32(Session["roomID"])
-                              && user.UserID == Convert.ToInt32(Session["ChatUserID"])
-                              select user).SingleOrDefault();
+            if (!string.IsNullOrEmpty(eventArgument))
+            {
+                if (eventArgument == "LogOut")
+                {
+                    ChatDataContext db = new ChatDataContext();
+                    var loggedUser = (from user in db.LoggedInUsers
+                                      where user.RoomID == Convert.ToInt32(Session["roomID"])
+                                      && user.UserID == Convert.ToInt32(Session["ChatUserID"])
+                                      select user).SingleOrDefault();
 
-            db.LoggedInUsers.DeleteOnSubmit(loggedUser);
-            db.SubmitChanges();
+                    db.LoggedInUsers.DeleteOnSubmit(loggedUser);
+                    db.SubmitChanges();
 
-            //usuń "ticket" forms authentication z przeglądarki i wyczyść info o autentykacji bieżącego użytkownika
-            FormsAuthentication.SignOut();
-            HttpContext.Current.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
-            updateTimer.Enabled = false;
-
-            _callBackStatus = "success";
+                    //usuń "ticket" forms authentication z przeglądarki i wyczyść info o autentykacji bieżącego użytkownika
+                    FormsAuthentication.SignOut();
+                    HttpContext.Current.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
+                    updateTimer.Enabled = false;
+                }
+                else if(eventArgument == "FocusThisWindow")
+                {
+                    FocusThisWindow();
+                }
+            }
+                _callBackStatus = "success";
         }
 
         //to zwracamy jako wynik działania po stronie serwera do metody LogOutUser po stronie klienta
@@ -300,6 +373,19 @@ namespace ChatV1
             updateTimer.Enabled = false;
 
             Response.Redirect("Default.aspx");
+        }
+
+        //obsługa zdarzeń przycisków na panelu akceptacji/odrzucenia propozycji prywatnej wiadomości
+        protected void btnChatNow_Click(object sender, EventArgs e)
+        {
+            panelPrivateChat.Visible = false;
+            Session["searchForPrivate"] = true;
+        }
+
+        protected void btnChatCancel_Click(object sender, EventArgs e)
+        {
+            panelPrivateChat.Visible = false;
+            Session["searchForPrivate"] = true;
         }
     }
 }
